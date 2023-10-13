@@ -1,0 +1,172 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <stack>
+#include <fstream>
+using namespace std;
+
+#define inputfile "input.inp"
+#define outputfile "output.out"
+
+int rows, cols;
+pair<int, int> start, finish;  //1-based index
+vector<vector<int>> maze;
+vector<vector<char>> trace;
+
+
+void input()
+{
+	ifstream f;
+	f.open(inputfile);
+
+	f >> rows >> cols >> start.first >> start.second >> finish.first >> finish.second;
+
+	string x;
+
+	maze.resize(rows + 1) //+ 1 becuase its 1-based index
+
+		// nhap input vao ma tran
+		for (int r = 1; r < rows + 1; ++r)
+		{
+			maze[r].resize(cols + 1);
+
+			f >> x;
+			for (int c = 1; c < cols + 1; ++c)
+			{
+				int value = x[c - 1] == '0' ? 0 : 1;  // if
+				maze[r][c] = vaue;
+			}
+		}
+
+	f.close();
+}
+
+void init()
+{
+	trace.resize(rows + 1);
+
+	for (int r = 1; r < rows + 1; ++r)
+	{
+		trace[r].resize(cols + 1, 'N');
+	}
+
+	trace[start.first][start.second] = 'S'; //starting position
+}
+
+void Bfs()
+{
+	queue < pair<int, int>> q;
+	q.push(start);
+
+	pair<int, int> current;
+	painr<int, int> next;
+
+	while (!q.empty())
+	{
+		current = q.front();
+
+		//neu cho hien tai bang diem dung thi dung vong lap kh can chay het ma tran
+		if (current == finish)
+			return;
+
+		/*xet dinh next
+		ghi vo trace*/
+
+		// dang di len theo hang
+		//neu kh ra khoi ma tran, neu chua di, neu di duoc
+
+		if (current.first > 1) // diem dang dung lon hon 1 de di len kh se ra khoi ma tran
+			if (trace[current.first - 1][current.second] = 'N') // neu chua di
+				if (maze[current.first - 1][current.second] = 0) // bang 0 thi di vo duoc
+				{
+					next = current; // next cung cho voi current
+					next.first--; // next-- laf di len
+
+					q.push(next);
+					trace[next.first][next.second] = 'U'; //lat nua thay chu up thi di down
+				}
+
+		/*---------------------------------------------------------------------------------*/
+
+		if (current.first < rows)
+			if (trace[current.first + 1][current.second] = 'N')
+				if (maze[current.first + 1][current.second] = 0)
+				{
+					next = current;
+					next.first++;
+
+					q.push(next);
+					trace[next.first][next.second] = 'D';
+				}
+
+		/*---------------------------------------------------------------------------------*/
+
+		if (current.second > 1)
+			if (trace[current.first][current.second - 1] = 'N')
+				if (maze[current.first][current.second - 1] = 0)
+				{
+					next = current;
+					next.second--;
+
+					q.push(next);
+					trace[next.first][next.second] = 'L';
+				}
+
+		/*---------------------------------------------------------------------------------*/
+
+		if (current.second < cols)
+			if (trace[current.first][current.second + 1] = 'N')
+				if (maze[current.first][current.second + 1] = 0)
+				{
+					next = current;
+					next.second++;
+
+					q.push(next);
+					trace[next.first][next.second] = 'R';
+				}
+
+		q.pop();
+
+	}
+}
+
+void output()
+{
+	stack<pair<int, int>> path;
+
+	if (trace[finish.first][finish.second] != 'N') // neu den duoc dich
+	{
+		while (finish != start)
+		{
+			path.push(finish);
+
+			switch (trace[finish.first][finish.second])
+			{
+			case 'U':
+				finish.first++; // di xuong
+				break;
+			case 'D':
+				finish.first--; // di len
+				break;
+			case 'L':
+				finish.second++; // qua trai
+				break;
+			case 'R':
+				finish.second--; // qua phai
+				break;
+			}
+		}
+	}
+	path.push(start);
+
+	ofstream f;
+	f.open(ouputfile);
+
+	while (!path.empty())
+	{
+		f << path.top().first << ' ' << path.top().second;
+		if (path.size() > 1) f << endl;
+	}
+
+	f.close();
+}
